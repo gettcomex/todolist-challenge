@@ -14,6 +14,9 @@ module.exports = {
     'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
     'no-restricted-syntax': 'off',
     'no-plusplus': 'off',
+    'no-unused-vars': 'off',
+    'no-alert': 'off',
+    'no-restricted-globals': 'off',
     semi: ['error', 'never'],
   },
   env: {
