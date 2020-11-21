@@ -1,7 +1,7 @@
 AllCops:
   TargetRubyVersion: 2.5.0
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: true
   EnforcedStyle: with_fixed_indentation
 
@@ -13,11 +13,11 @@ Layout/EndAlignment:
   Enabled: true
   EnforcedStyleAlignWith: variable
 
-Layout/IndentArray:
+Layout/FirstArrayElementIndentation:
   Enabled: true
   EnforcedStyle: consistent
 
-Layout/IndentHash:
+Layout/FirstHashElementIndentation:
   Enabled: true
   EnforcedStyle: consistent
 
