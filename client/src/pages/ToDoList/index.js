@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 
 import { Container, ListWrapper, ListItems, ListItem } from './styles'
+import graph from '../../services/graph'
 import api from '../../services/api'
 
 export default function ToDoList() {
@@ -12,32 +13,82 @@ export default function ToDoList() {
 
   useEffect(() => {
     async function loadTasks() {
-      await fetch(`${api}/tasks`)
+      const query = `query {
+        tasks {
+          id
+          description
+          isDone
+        }
+      }`
+      await fetch(`${graph}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+        }),
+      })
         .then(response => response.json())
-        .then(data => setOriginalTasks(data))
+        .then(data => setOriginalTasks(data.data.tasks))
       setTasks(originalTasks)
     }
     loadTasks()
   }, [])
 
   async function handleUpdateTaskDescription(id, description) {
-    await fetch(`${api}/tasks/${id}?description=${description}`,
+    const mutation = `mutation {
+      updateTaskDescription(input:{
+        id: ${id}
+        description: "${description}"
+      }) {
+        task {
+          id,
+          description,
+          isDone
+        }
+      }
+    }`
+    await fetch(`${graph}`,
       {
-        method: 'PUT',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: mutation }),
       })
   }
 
   async function handleUpdateTaskStatus(id, status) {
-    await fetch(`${api}/tasks/${id}?isDone=${status}`,
+    const mutation = `mutation {
+      updateTaskStatus(input:{
+        id: ${id}
+        isDone: ${status}
+      }) {
+        task {
+          id,
+          description,
+          isDone
+        }
+      }
+    }`
+    await fetch(`${graph}`,
       {
-        method: 'PUT',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: mutation }),
       })
   }
 
   async function handleDeleteTask(id) {
-    await fetch(`${api}/tasks/${id}`,
+    const mutation = `mutation {
+      deleteTask(input:{
+        id: ${id}
+      }) {
+        success
+      }
+    }`
+    await fetch(`${graph}`,
       {
-        method: 'DELETE',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: mutation }),
       })
   }
 
