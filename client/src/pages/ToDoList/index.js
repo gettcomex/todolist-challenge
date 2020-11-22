@@ -1,20 +1,50 @@
 import React, { useRef, useState, useEffect } from 'react'
 
 import { Container, ListWrapper, ListItems, ListItem } from './styles'
+import api from '../../services/api'
 
 export default function ToDoList() {
   const [originalTasks, setOriginalTasks] = useState([])
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState()
-  // const [refs, setRefs] = useState([])
   const refs = useRef([])
-  // const inputEl = useRef(null)
-  // let refs = useRef([React.createRef(), React.createRef()])
   let clickTimeout = null
 
   useEffect(() => {
-    // add or remove refs
-    refs.current = refs.current.slice(0, tasks.length)
+    async function loadTasks() {
+      await fetch(`${api}/tasks`)
+        .then(response => response.json())
+        .then(data => setOriginalTasks(data))
+      setTasks(originalTasks)
+    }
+    loadTasks()
+  }, [])
+
+  async function handleUpdateTaskDescription(id, description) {
+    await fetch(`${api}/tasks/${id}?description=${description}`,
+      {
+        method: 'PUT',
+      })
+  }
+
+  async function handleUpdateTaskStatus(id, status) {
+    await fetch(`${api}/tasks/${id}?isDone=${status}`,
+      {
+        method: 'PUT',
+      })
+  }
+
+  async function handleDeleteTask(id) {
+    await fetch(`${api}/tasks/${id}`,
+      {
+        method: 'DELETE',
+      })
+  }
+
+  useEffect(() => {
+    if (tasks !== undefined) {
+      refs.current = refs.current.slice(0, tasks.length)
+    }
   }, [tasks])
 
   function setReadOnly(position) {
@@ -34,9 +64,15 @@ export default function ToDoList() {
     }
   }
 
-  function handleVerifyKeyItem(e, position) {
+  function handleVerifyKeyItem(e, position, taskId) {
     if (e.key === 'Enter') {
-      refs.current[position].defaultValue = refs.current[position].value
+      handleUpdateTaskDescription(taskId, refs.current[position].value)
+      const changeTaskDescription = tasks.find(task => task.id === taskId)
+      changeTaskDescription.description = refs.current[position].value
+      const taskDescriptionIndex = tasks.findIndex(task => task.id === taskId)
+      tasks[taskDescriptionIndex] = changeTaskDescription
+      const originalTaskDescriptionIndex = originalTasks.findIndex(task => task.id === taskId)
+      originalTasks[originalTaskDescriptionIndex] = changeTaskDescription
       refs.current[position].readOnly = true
     }
     if (e.key === 'Escape') {
@@ -45,23 +81,17 @@ export default function ToDoList() {
     }
   }
 
-  function handleNewTask(e) {
-    const id = Math.random()
+  async function handleNewTask(e) {
     e.preventDefault()
-    setOriginalTasks([...originalTasks,
+    await fetch(`${api}/tasks?description=${newTask}&isDone=false`,
       {
-        id,
-        description: newTask,
-        created_at: Date.now(),
-        isDone: false,
-      }])
-    setTasks([...tasks,
-      {
-        id,
-        description: newTask,
-        created_at: Date.now(),
-        isDone: false,
-      }])
+        method: 'POST',
+      })
+      .then(response => response.json())
+      .then(data => {
+        setOriginalTasks([...originalTasks, data])
+        setTasks([...tasks, data])
+      })
     setNewTask('')
   }
 
@@ -75,6 +105,7 @@ export default function ToDoList() {
 
   function handleChangeStatus(taskId) {
     const changeTaskStatus = tasks.find(task => task.id === taskId)
+    handleUpdateTaskStatus(taskId, !changeTaskStatus.isDone)
     changeTaskStatus.isDone = !changeTaskStatus.isDone
     const taskStatusIndex = tasks.findIndex(task => task.id === taskId)
     tasks[taskStatusIndex] = changeTaskStatus
@@ -85,6 +116,7 @@ export default function ToDoList() {
   function handleRemoveTask(taskId) {
     const message = confirm('Deseja apagar essa tarefa?')
     if (message === true) {
+      handleDeleteTask(taskId)
       setOriginalTasks(originalTasks.filter(task => task.id !== taskId))
       setTasks(tasks.filter(task => task.id !== taskId))
     }
@@ -121,7 +153,7 @@ export default function ToDoList() {
                 ref={(el) => { refs.current[i] = el }}
                 readOnly
                 onClick={() => { getClicks(i) }}
-                onKeyDown={(e) => handleVerifyKeyItem(e, i)}
+                onKeyDown={(e) => handleVerifyKeyItem(e, i, task.id)}
               />
               <button type="button" onClick={() => { handleRemoveTask(task.id) }}>X</button>
             </ListItem>
