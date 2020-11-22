@@ -2,14 +2,16 @@
 
 module Mutations
   class UpdateTaskStatus < GraphQL::Schema::RelayClassicMutation
-    field :task, Types::TaskType, null: false
+    field :tasks, [Types::TaskType], null: true
+
 
     argument :id, ID, required: true
     argument :isDone, Boolean, required: false
 
     def resolve(id:, isDone:)
       {
-        task: Task.update(id, {isDone: isDone })
+        _: Task.update(id, {isDone: isDone }),
+        tasks: Task.all
       }
     end
   end

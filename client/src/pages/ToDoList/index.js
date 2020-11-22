@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
-
+import { useQuery, useMutation } from '@apollo/client'
+import gql from 'graphql-tag'
 import { Container, ListWrapper, ListItems, ListItem } from './styles'
-import graph from '../../services/graph'
-import api from '../../services/api'
 
 export default function ToDoList() {
   const [originalTasks, setOriginalTasks] = useState([])
@@ -10,86 +9,70 @@ export default function ToDoList() {
   const [newTask, setNewTask] = useState()
   const refs = useRef([])
   let clickTimeout = null
-
-  useEffect(() => {
-    async function loadTasks() {
-      const query = `query {
-        tasks {
-          id
-          description
-          isDone
-        }
-      }`
-      await fetch(`${graph}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query,
-        }),
-      })
-        .then(response => response.json())
-        .then(data => setOriginalTasks(data.data.tasks))
-      setTasks(originalTasks)
+  const getTasksQuery = gql`query {
+    tasks {
+      id
+      description
+      isDone
     }
-    loadTasks()
-  }, [])
+  }`
+
+  const createTaskQuery = gql`mutation ($description: String!, $isDone: Boolean!){
+    createTask(input: {description: $description, isDone: $isDone}){
+      task {
+        id,
+        description,
+        isDone
+      }
+    }
+  }`
+
+  const updateTaskDescriptionQuery = gql`mutation ($id: ID!, $description: String!){
+    updateTaskDescription(input: {id: $id, description: $description}){
+      tasks {
+        id,
+        description,
+        isDone
+      }
+    }
+  }`
+
+  const updateTaskStatusQuery = gql`mutation ($id: ID!, $isDone: Boolean!){
+    updateTaskStatus(input: {id: $id, isDone: $isDone}){
+      tasks {
+        id,
+        description,
+        isDone
+      }
+    }
+  }`
+
+  const deleteTaskQuery = gql`mutation ($id: ID!) {
+    deleteTask(input:{id: $id}) {
+      success
+    }
+  }`
+
+  const { loading, error, data } = useQuery(getTasksQuery)
+  const [updateTaskDescription] = useMutation(updateTaskDescriptionQuery)
+  const [updateTaskStatus] = useMutation(updateTaskStatusQuery)
+  const [createTask] = useMutation(createTaskQuery)
+  const [deleteTask] = useMutation(deleteTaskQuery)
 
   async function handleUpdateTaskDescription(id, description) {
-    const mutation = `mutation {
-      updateTaskDescription(input:{
-        id: ${id}
-        description: "${description}"
-      }) {
-        task {
-          id,
-          description,
-          isDone
-        }
-      }
-    }`
-    await fetch(`${graph}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: mutation }),
-      })
+    updateTaskDescription({ variables: { id, description } }).then(responseData => {
+      setOriginalTasks(responseData.data.updateTaskDescription.tasks)
+    })
   }
 
-  async function handleUpdateTaskStatus(id, status) {
-    const mutation = `mutation {
-      updateTaskStatus(input:{
-        id: ${id}
-        isDone: ${status}
-      }) {
-        task {
-          id,
-          description,
-          isDone
-        }
-      }
-    }`
-    await fetch(`${graph}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: mutation }),
-      })
+  async function handleUpdateTaskStatus(id, isDone) {
+    updateTaskStatus({ variables: { id, isDone } }).then(responseData => {
+      setOriginalTasks(responseData.data.updateTaskStatus.tasks)
+    })
   }
 
   async function handleDeleteTask(id) {
-    const mutation = `mutation {
-      deleteTask(input:{
-        id: ${id}
-      }) {
-        success
-      }
-    }`
-    await fetch(`${graph}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: mutation }),
-      })
+    deleteTask({ variables: { id } })
   }
 
   useEffect(() => {
@@ -97,6 +80,13 @@ export default function ToDoList() {
       refs.current = refs.current.slice(0, tasks.length)
     }
   }, [tasks])
+
+  useEffect(() => {
+    if (data !== undefined) {
+      setOriginalTasks(data.tasks)
+      setTasks(data.tasks)
+    }
+  }, [data])
 
   function setReadOnly(position) {
     refs.current[position].readOnly = false
@@ -111,19 +101,13 @@ export default function ToDoList() {
       clickTimeout = setTimeout(() => {
         clearTimeout(clickTimeout)
         clickTimeout = null
-      }, 2000)
+      }, 500)
     }
   }
 
   function handleVerifyKeyItem(e, position, taskId) {
     if (e.key === 'Enter') {
       handleUpdateTaskDescription(taskId, refs.current[position].value)
-      const changeTaskDescription = tasks.find(task => task.id === taskId)
-      changeTaskDescription.description = refs.current[position].value
-      const taskDescriptionIndex = tasks.findIndex(task => task.id === taskId)
-      tasks[taskDescriptionIndex] = changeTaskDescription
-      const originalTaskDescriptionIndex = originalTasks.findIndex(task => task.id === taskId)
-      originalTasks[originalTaskDescriptionIndex] = changeTaskDescription
       refs.current[position].readOnly = true
     }
     if (e.key === 'Escape') {
@@ -134,15 +118,10 @@ export default function ToDoList() {
 
   async function handleNewTask(e) {
     e.preventDefault()
-    await fetch(`${api}/tasks?description=${newTask}&isDone=false`,
-      {
-        method: 'POST',
-      })
-      .then(response => response.json())
-      .then(data => {
-        setOriginalTasks([...originalTasks, data])
-        setTasks([...tasks, data])
-      })
+    createTask({ variables: { description: newTask, isDone: false } }).then(responseData => {
+      setOriginalTasks([...originalTasks, responseData.data.createTask.task])
+      setTasks([...tasks, responseData.data.createTask.task])
+    })
     setNewTask('')
   }
 
@@ -154,14 +133,8 @@ export default function ToDoList() {
     }
   }
 
-  function handleChangeStatus(taskId) {
-    const changeTaskStatus = tasks.find(task => task.id === taskId)
-    handleUpdateTaskStatus(taskId, !changeTaskStatus.isDone)
-    changeTaskStatus.isDone = !changeTaskStatus.isDone
-    const taskStatusIndex = tasks.findIndex(task => task.id === taskId)
-    tasks[taskStatusIndex] = changeTaskStatus
-    const originalTaskStatusIndex = originalTasks.findIndex(task => task.id === taskId)
-    originalTasks[originalTaskStatusIndex] = changeTaskStatus
+  function handleChangeStatus(taskId, isDone) {
+    handleUpdateTaskStatus(taskId, isDone)
   }
 
   function handleRemoveTask(taskId) {
@@ -173,44 +146,50 @@ export default function ToDoList() {
     }
   }
 
-  return (
-    <Container>
-      <ListWrapper>
-        <form onSubmit={handleNewTask}>
-          <p>To-Do List :D</p>
-          <input
-            placeholder="O que precisa ser feito?"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-          />
-        </form>
-        <ListItems>
-          <div className="listItemsOptions">
-            <button type="button" onClick={() => { handleFilterStatus() }}>Todas</button>
-            <button type="button" onClick={() => { handleFilterStatus(false) }}>Em andamento</button>
-            <button type="button" onClick={() => { handleFilterStatus(true) }}>Concluídas</button>
-          </div>
-          {tasks.map((task, i) => (
-            <ListItem key={task.id}>
-              <input
-                className="completeTaskCheckbox"
-                type="checkbox"
-                defaultChecked={task.isDone}
-                onChange={() => { handleChangeStatus(task.id) }}
-              />
-              <input
-                className="taskInput"
-                defaultValue={task.description}
-                ref={(el) => { refs.current[i] = el }}
-                readOnly
-                onClick={() => { getClicks(i) }}
-                onKeyDown={(e) => handleVerifyKeyItem(e, i, task.id)}
-              />
-              <button type="button" onClick={() => { handleRemoveTask(task.id) }}>X</button>
-            </ListItem>
-          ))}
-        </ListItems>
-      </ListWrapper>
-    </Container>
-  )
+  if (loading) {
+    return (<p>Loading...</p>)
+  }
+
+  if (!error && data.tasks !== undefined) {
+    return (
+      <Container>
+        <ListWrapper>
+          <form onSubmit={handleNewTask}>
+            <p>To-Do List :D</p>
+            <input
+              placeholder="O que precisa ser feito?"
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+            />
+          </form>
+          <ListItems>
+            <div className="listItemsOptions">
+              <button type="button" onClick={() => { handleFilterStatus() }}>Todas</button>
+              <button type="button" onClick={() => { handleFilterStatus(false) }}>Em andamento</button>
+              <button type="button" onClick={() => { handleFilterStatus(true) }}>Concluídas</button>
+            </div>
+            {tasks.map((task, i) => (
+              <ListItem key={task.id}>
+                <input
+                  className="completeTaskCheckbox"
+                  type="checkbox"
+                  defaultChecked={task.isDone}
+                  onChange={() => { handleChangeStatus(task.id, !task.isDone) }}
+                />
+                <input
+                  className="taskInput"
+                  defaultValue={task.description}
+                  ref={(el) => { refs.current[i] = el }}
+                  readOnly
+                  onClick={() => { getClicks(i) }}
+                  onKeyDown={(e) => handleVerifyKeyItem(e, i, task.id)}
+                />
+                <button type="button" onClick={() => { handleRemoveTask(task.id) }}>X</button>
+              </ListItem>
+            ))}
+          </ListItems>
+        </ListWrapper>
+      </Container>
+    )
+  }
 }
