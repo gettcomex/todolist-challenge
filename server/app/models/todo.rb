@@ -1,3 +1,3 @@
 class Todo < ApplicationRecord
-  validates_presence_of :title, :finished
+  validates_presence_of :title
 end
