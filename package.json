@@ -1,0 +1,16 @@
+{
+  "name": "todolist-challenge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "author": "Felipe Luiz <felipebluiz@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@todolist-challenge/eslint-config": "*"
+  }
+}
