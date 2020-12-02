@@ -30,11 +30,6 @@ export const TodoForm: React.FC = () => {
   const handleAddTask = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
 
-        if (!newTask) {
-      setInputError('Digite uma tarefa pra adicioná-la na lista');
-      return;
-    }
-
     try {
       const response = await api.get<Task>(`todos/${newTask}`);
       const task = response.data;
