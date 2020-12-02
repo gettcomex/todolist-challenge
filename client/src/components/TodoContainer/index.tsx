@@ -6,7 +6,7 @@ export const TodoContainer: React.FC = ({ children }) => {
 
   return (
     <Container>
-      { children }
+      { children}
     </Container>
   );
 };
