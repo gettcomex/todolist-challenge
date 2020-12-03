@@ -9,8 +9,7 @@ export default createGlobalStyle`
   }
 
   body {
-    background:
-    linear-gradient(90deg,#54a0ff 0%,#50a0dd 100%);
+    background: linear-gradient(100deg, #546de5 50%, #425de2 0);
   }
 
   body, input, button {

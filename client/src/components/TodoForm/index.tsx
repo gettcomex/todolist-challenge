@@ -1,5 +1,6 @@
-import React, { useState, FormEvent, useEffect } from 'react';
-import { Form, Error, Tasks } from './styles';
+import React, { useState, FormEvent, useEffect, useContext } from 'react';
+import { Form, Error } from './styles';
+import { TaskListContext } from '../../hooks/tasks';
 import api from '../../services/api';
 
 interface Task {
@@ -8,9 +9,10 @@ interface Task {
 }
 
 export const TodoForm: React.FC = () => {
+  const { addTask } = useContext(TaskListContext);
   const [newTask, setNewTask] = useState('');
   const [inputError, setInputError] = useState('');
-  const [tasks, setTasks] = useState<Task[]>(() => {
+  const [tasks, setTasks] = useState(() => {
     const storagedTasks = localStorage.getItem(
       '@Tasks',
     );
@@ -44,18 +46,10 @@ export const TodoForm: React.FC = () => {
   return (
     <>
       <Form onSubmit={handleAddTask}>
-        <input value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="Exemplo: Contratar Matheus Motta" />
+        <input placeholder="Exemplo: Contratar Matheus Motta" />
         <button type="button">Adicionar tarefa</button>
       </Form>
       { inputError && <Error>{inputError}</Error>}
-
-      <Tasks>
-        {tasks.map((task) => (
-          <div>
-            {task.title}
-          </div>
-        ))}
-      </Tasks>
     </>
   );
 };
