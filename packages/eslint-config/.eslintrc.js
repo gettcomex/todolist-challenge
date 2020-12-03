@@ -14,7 +14,8 @@ module.exports = {
   plugins: ['react', 'prettier'],
   rules: {
     'prettier/prettier': 'error',
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }]
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }]
   },
   settings: {
     react: {
