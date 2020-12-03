@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 
-export const Container = styled.form`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: start;
+  align-items: center;
   width: 720px;
   min-height: 600px;
   background: #232431;
