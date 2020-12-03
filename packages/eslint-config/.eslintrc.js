@@ -15,7 +15,10 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }]
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+    'import/no-dynamic-require': 0,
+    'no-console': 'off',
+    'global-require': 'off'
   },
   settings: {
     react: {
