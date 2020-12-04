@@ -18,7 +18,7 @@ export const TodoForm: React.FC = () => {
 
   const handleSubmit = useCallback(async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    // if (!title) return;
+    if (!title || /^\s*$/.test(title)) return;
     console.log(title);
     addTask(title);
     setTitle('');

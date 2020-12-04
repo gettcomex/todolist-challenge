@@ -4,7 +4,7 @@ import { TaskListContext } from '../../hooks/tasks';
 import { TaskCard, Container } from './styles';
 
 export const TodoList: React.FC = () => {
-  const { tasks } = useContext(TaskListContext);
+  const { tasks, removeTask } = useContext(TaskListContext);
   return (
     <Container>
       {tasks.map((task) => (
@@ -12,7 +12,7 @@ export const TodoList: React.FC = () => {
           <TaskCard key={task.id}>
             <div>{task.title}</div>
             <span>{task.finished ? 'Tarefa completa' : 'Tarefa em andamento'}</span>
-            <HiTrash />
+            <HiTrash onClick={() => removeTask(task.id)} />
           </TaskCard>
         </>
       ))}

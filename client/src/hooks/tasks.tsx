@@ -1,8 +1,8 @@
 import React, { createContext, useState, useCallback } from 'react';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   finished: boolean;
 }
@@ -10,27 +10,35 @@ interface Task {
 interface TasksData {
   tasks: Task[];
   addTask(title: string): void;
+  removeTask(id: string): void;
 }
 
 type AddTask = (title: string) => void;
+
+type RemoveTask = (id: string) => void;
 
 export const TaskListContext = createContext<TasksData>({} as TasksData);
 
 export const TaskListContextProvider: React.FC = ({ children }) => {
   const [tasks, setTasks] = useState([
-    { id: 2, title: 'Lavar a louça', finished: true },
-    { id: 3, title: 'Tirar o lixo', finished: false },
-    { id: 4, title: 'ATirar o lixo', finished: false },
+    { id: uuid(), title: 'Lavar a louça', finished: true },
+    { id: uuid(), title: 'Tirar o lixo', finished: false },
+    { id: uuid(), title: 'Limpar a casa', finished: false },
   ]);
 
   const addTask: AddTask = useCallback(async (title: string) => {
-    const newTasks = [...tasks, { id: Math.random(), title, finished: false }];
+    const newTasks = [...tasks, { id: uuid(), title, finished: false }];
     setTasks(newTasks);
     console.log(newTasks);
   }, [tasks]);
 
+  const removeTask: RemoveTask = useCallback(async (id: string) => {
+    const newTasks = [...tasks].filter((task) => task.id !== id);
+    setTasks(newTasks);
+  }, [tasks]);
+
   return (
-    <TaskListContext.Provider value={{ tasks, addTask }}>
+    <TaskListContext.Provider value={{ tasks, addTask, removeTask }}>
       {children}
     </TaskListContext.Provider>
   );
