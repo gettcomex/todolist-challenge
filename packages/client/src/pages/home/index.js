@@ -19,34 +19,49 @@ const filters = [
 ]
 
 function Home() {
-  const [_todos] = useState(todos)
-  const [selectedFilter, setSelectedFilter] = useState(new Map())
+  const [_todos, setTodos] = useState(todos)
+  const [filteredTodos, setFilteredTodos] = useState(todos)
+  const [filterValue, setFilterValue] = useState('all')
+  const [inputValue, setInputValue] = useState('')
   const [inputFocus, setInputFocus] = useState(false)
 
-  function onPressFilter(key) {
-    const selectedItem = new Map()
-    selectedItem.set(key, !selectedFilter.get(key))
+  function handleFilteredTodos(key) {
+    setFilteredTodos(
+      _todos.filter(item => (key === 'all' ? item : item.status === key))
+    )
+  }
 
-    setSelectedFilter(selectedItem)
+  function onPressFilter(key) {
+    setFilterValue(key)
+    handleFilteredTodos(key)
   }
 
   function handleInputChange(e) {
+    setInputValue(e.target.value)
+
     if (e.key === 'Enter') {
-      console.log(e.target.value)
+      setTodos([
+        { id: _todos.length, name: e.target.value, status: 'in-progress' },
+        ..._todos
+      ])
+
+      setInputValue('')
     }
   }
 
   function handleTodoStatus(id, status) {
-    console.log(id, status)
+    setTodos(
+      _todos.map(item => (item.id === id ? { ...item, status } : { ...item }))
+    )
   }
 
   function deleteTodo(id) {
-    console.log(id)
+    setTodos(_todos.filter(item => item.id !== id))
   }
 
   useEffect(() => {
-    onPressFilter('all')
-  }, [])
+    onPressFilter(filterValue)
+  }, [_todos])
 
   return (
     <Container>
@@ -57,9 +72,11 @@ function Home() {
             name="todo"
             type="text"
             placeholder="Criar uma tarefa"
+            onChange={handleInputChange}
             onFocus={() => setInputFocus(true)}
             onBlur={() => setInputFocus(false)}
             onKeyDown={handleInputChange}
+            value={inputValue}
           />
         </Label>
       </Header>
@@ -70,13 +87,13 @@ function Home() {
             <Filter
               key={filter.key.toString()}
               item={filter}
-              selected={!!selectedFilter.get(filter.key)}
+              filterValue={filterValue}
               onPressFilter={onPressFilter}
             />
           ))}
         </div>
         <div className="todos">
-          {_todos.map(todo => (
+          {filteredTodos.map(todo => (
             <Todo
               key={todo.id.toString()}
               item={todo}
