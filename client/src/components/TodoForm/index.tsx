@@ -2,11 +2,6 @@ import React, { useState, FormEvent, useEffect, useContext, useCallback } from '
 import { Form } from './styles';
 import { TaskListContext } from '../../hooks/tasks';
 
-interface Task {
-  title: string;
-  finished: boolean;
-}
-
 export const TodoForm: React.FC = () => {
   const { addTask } = useContext(TaskListContext);
   const [title, setTitle] = useState('');
@@ -28,7 +23,7 @@ export const TodoForm: React.FC = () => {
     <>
       <Form onSubmit={handleSubmit}>
         <input type="text" value={title} onChange={handleChange} required placeholder="Exemplo: Contratar Matheus Motta" />
-        <button type="button">Adicionar tarefa</button>
+        <button type="submit">Adicionar tarefa</button>
       </Form>
     </>
   );
