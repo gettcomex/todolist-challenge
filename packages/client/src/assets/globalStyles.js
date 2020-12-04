@@ -2,15 +2,15 @@ import { createGlobalStyle } from 'styled-components'
 import colors from './colors'
 
 export default createGlobalStyle`
-  html, #root {
-    height: 100%;
-    scroll-behavior: smooth;
-    overflow-x: hidden;
+  #root {
+    width: 100%;
   }
 
   body {
-    height: 100%;
-    background-color: ${colors.white};
+    height: 100vh;
+    display: flex;
+    scroll-behavior: smooth;
+    background-color: ${colors.lighter};
     color: ${colors.dark};
     margin: 0;
     padding: 0;
@@ -139,5 +139,25 @@ export default createGlobalStyle`
   :-ms-input-placeholder { color: #CCCCCC }
   ::-ms-input-placeholder { color: #CCCCCC }
   ::placeholder { color: #CCCCCC }
+
   code { font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace }
+
+  @media screen and (min-width: 768px) {
+    #root {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(3, 1fr);
+      width: 90vw;
+      height: 90vh;
+      margin: auto;
+
+      ::before, ::after {
+        content:"";
+      }
+    }
+
+    body {
+      background-color: ${colors.white};
+    }
+  }
 `

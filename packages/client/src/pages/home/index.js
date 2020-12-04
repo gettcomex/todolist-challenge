@@ -4,7 +4,7 @@ import { FaPlusCircle } from 'react-icons/fa'
 import Filter from '../../components/filter'
 import Todo from '../../components/todo'
 
-import { Wrapper, Container, Header, Content, Label, Input } from './styles'
+import { Container, Header, Content, Label, Input } from './styles'
 
 const todos = [
   { id: 0, name: 'Levar meu Macbook Pro para o conserto', status: 'complete' },
@@ -49,46 +49,44 @@ function Home() {
   }, [])
 
   return (
-    <Wrapper>
-      <Container>
-        <Header>
-          <Label focus={inputFocus}>
-            <FaPlusCircle className="fa fa-plus-circle" />
-            <Input
-              name="todo"
-              type="text"
-              placeholder="Criar uma tarefa"
-              onFocus={() => setInputFocus(true)}
-              onBlur={() => setInputFocus(false)}
-              onKeyDown={handleInputChange}
+    <Container>
+      <Header>
+        <Label focus={inputFocus}>
+          <FaPlusCircle className="fa fa-plus-circle" />
+          <Input
+            name="todo"
+            type="text"
+            placeholder="Criar uma tarefa"
+            onFocus={() => setInputFocus(true)}
+            onBlur={() => setInputFocus(false)}
+            onKeyDown={handleInputChange}
+          />
+        </Label>
+      </Header>
+      <Content>
+        <div className="filters">
+          <span>Status</span>
+          {filters.map(filter => (
+            <Filter
+              key={filter.key.toString()}
+              item={filter}
+              selected={!!selectedFilter.get(filter.key)}
+              onPressFilter={onPressFilter}
             />
-          </Label>
-        </Header>
-        <Content>
-          <div className="filters">
-            <span>Status</span>
-            {filters.map(filter => (
-              <Filter
-                key={filter.key.toString()}
-                item={filter}
-                selected={!!selectedFilter.get(filter.key)}
-                onPressFilter={onPressFilter}
-              />
-            ))}
-          </div>
-          <div className="todos">
-            {_todos.map(todo => (
-              <Todo
-                key={todo.id.toString()}
-                item={todo}
-                handleTodoStatus={handleTodoStatus}
-                deleteTodo={deleteTodo}
-              />
-            ))}
-          </div>
-        </Content>
-      </Container>
-    </Wrapper>
+          ))}
+        </div>
+        <div className="todos">
+          {_todos.map(todo => (
+            <Todo
+              key={todo.id.toString()}
+              item={todo}
+              handleTodoStatus={handleTodoStatus}
+              deleteTodo={deleteTodo}
+            />
+          ))}
+        </div>
+      </Content>
+    </Container>
   )
 }
 

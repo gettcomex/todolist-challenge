@@ -1,21 +1,18 @@
 import styled from 'styled-components'
 import colors from '../../assets/colors'
 
-export const Wrapper = styled.div`
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
 export const Container = styled.div`
-  max-width: 480px;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background-color: ${colors.primary};
-  border-radius: 15px;
+
+  @media screen and (min-width: 768px) {
+    max-width: 500px;
+    margin: 0 auto 35px;
+    border-radius: 15px;
+  }
 `
 
 export const Header = styled.div`
@@ -26,9 +23,6 @@ export const Header = styled.div`
 
 export const Content = styled.div`
   background-color: ${colors.lighter};
-  border-radius: 15px;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
   padding: 20px 15px 2px;
 
   .filters {
@@ -44,6 +38,13 @@ export const Content = styled.div`
       letter-spacing: 0.5px;
       margin-bottom: 8px;
     }
+  }
+
+  @media screen and (min-width: 768px) {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
   }
 `
 
