@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect, useContext, useCallback } from 'react';
+import React, { useState, FormEvent, useContext, useCallback } from 'react';
 import { Form } from './styles';
 import { TaskListContext } from '../../hooks/tasks';
 

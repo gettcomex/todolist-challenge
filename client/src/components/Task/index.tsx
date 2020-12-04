@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { HiTrash } from 'react-icons/hi';
 import { TaskListContext } from '../../hooks/tasks';
 import { TaskCard } from './styles';

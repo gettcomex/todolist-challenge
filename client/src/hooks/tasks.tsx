@@ -30,28 +30,30 @@ export const TaskListContextProvider: React.FC = ({ children }) => {
     { id: uuid(), title: 'Limpar a casa', finished: false },
   ]);
 
-  const [editTassk, setEditTask] = useState({
-    id: uuid(),
-    title: '',
-    finished: false,
-  });
-
   useEffect(() => {
     async function loadTasks(): Promise<void> {
-      const response = await api.get('/todos');
-      setTasks(response.data);
-      console.log(response.data);
+      try {
+        const response = await api.get('/todos');
+        setTasks(response.data);
+        console.log(response.data);
+      } catch (err) {
+        console.log(err);
+      }
     }
     loadTasks();
   }, []);
 
   const addTask: AddTask = useCallback(async (title: string) => {
-    const response = await api.post('todos/', {
-      title,
-      finished: false,
-    });
-    setTasks([...tasks, response.data]);
-    console.log(response.data);
+    try {
+      const response = await api.post('todos/', {
+        title,
+        finished: false,
+      });
+      setTasks([...tasks, response.data]);
+      console.log(response.data);
+    } catch (err) {
+      console.log(err);
+    }
   }, [tasks]);
 
   const removeTask: RemoveTask = useCallback(async (id: string) => {
