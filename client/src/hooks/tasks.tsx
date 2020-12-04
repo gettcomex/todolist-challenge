@@ -42,25 +42,31 @@ export const TaskListContextProvider: React.FC = ({ children }) => {
       setTasks(response.data);
       console.log(response.data);
     }
-
     loadTasks();
   }, []);
 
   const addTask: AddTask = useCallback(async (title: string) => {
-    const newTasks = [...tasks, { id: uuid(), title, finished: false }];
-    setTasks(newTasks);
-    console.log(newTasks);
+    const response = await api.post('todos/', {
+      title,
+      finished: false,
+    });
+    setTasks([...tasks, response.data]);
+    console.log(response.data);
   }, [tasks]);
 
   const removeTask: RemoveTask = useCallback(async (id: string) => {
-    const newTasks = [...tasks].filter((task) => task.id !== id);
-    setTasks(newTasks);
+    try {
+      await api.delete(`todos/${id}`);
+      const newTasks = [...tasks].filter((task) => task.id !== id);
+      setTasks(newTasks);
+    } catch (err) {
+      console.log(err);
+    }
   }, [tasks]);
 
   const findTask: FindTask = useCallback(async (id: string) => {
     const foundTask = [...tasks].find((task) => task.id === id);
     const editedTask = foundTask?.title;
-    // setEditTask(foundTask);
     console.log(foundTask, editedTask);
   }, [tasks]);
 
