@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  resources :todos, defaults: {format: :json}
+  resources :todos, path: "api/todos", defaults: {format: :json}
 end
