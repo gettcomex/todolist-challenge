@@ -1,6 +1,7 @@
 import React from 'react';
 import { TodoForm } from './components/TodoForm';
 import { TodoContainer } from './components/TodoContainer';
+import { Apollo } from './services/graphql';
 import { TaskListContextProvider } from './hooks/tasks';
 import GlobalStyle from './styles/global';
 import { TodoList } from './components/TodoList';
@@ -8,10 +9,12 @@ import { TodoList } from './components/TodoList';
 const App: React.FC = () => (
   <>
     <TaskListContextProvider>
-      <TodoContainer>
-        <TodoForm />
-        <TodoList />
-      </TodoContainer>
+      <Apollo>
+        <TodoContainer>
+          <TodoForm />
+          <TodoList />
+        </TodoContainer>
+      </Apollo>
     </TaskListContextProvider>
 
     <GlobalStyle />
