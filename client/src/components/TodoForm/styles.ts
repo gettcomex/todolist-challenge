@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Form = styled.form`
-  margin-bottom: 32px;
+  margin-bottom: 18px;
   margin-top: 20px;
   display: flex;
   width: 90%;
@@ -10,14 +10,14 @@ export const Form = styled.form`
   input {
     padding: 22px 22px 14px 16px;
     border-radius: 4px 0 0 4px;
-    border: 2px solid #ffc054;
+    border: 2px solid  #546de5;
     outline: none;
     width: 80%;
     background: rgba(250, 250, 250, 0.9);
     transition: background 0.2s ease;
 
     &:focus {
-      background: rgba(254, 254, 254, 0.95);
+      background: #fff;
     }
   }
 
@@ -28,11 +28,11 @@ export const Form = styled.form`
     text-transform: capitalize;
     border: none;
     border-radius: 0 4px 4px 0;
-    background: linear-gradient(90deg, #e85156 0%, #e2424f 100%);
+    background: #546de5;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #425de2;
+    }
   }
 `;
-
-export const Error = styled.span`
-    display: block;
-    color: #c53030;
-    margin-top: 8px;`;
