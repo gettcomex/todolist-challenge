@@ -1,7 +1,7 @@
 module.exports = {
-  "extends": "airbnb",
-  "parser": "babel-eslint",
-  "rules": {
+  extends: "airbnb",
+  parser: "babel-eslint",
+  rules: {
     "arrow-parens": "off",
     "object-curly-newline": "off",
     "import/prefer-default-export": "off",
@@ -10,13 +10,13 @@ module.exports = {
     "react/style-prop-object": "off",
     "react/no-multi-comp": "off",
     "react/prefer-stateless-function": "off",
-    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 1 }],
+    "no-multiple-empty-lines": ["error", { max: 1, maxEOF: 1 }],
     "no-restricted-syntax": "off",
     "no-plusplus": "off",
-    "semi": ["error", "never"]
+    semi: ["error", "never"],
   },
-  "env": {
-    "browser": true,
-    "jest": true
-  }
-}
+  env: {
+    browser: true,
+    jest: true,
+  },
+};
