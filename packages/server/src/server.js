@@ -1,12 +1,5 @@
-const express = require('express')
-const cors = require('cors')
-const routes = require('./routes')
+const createServer = require('./app')
 
-const app = express()
+const app = createServer()
 
-app.use(cors())
-app.use(routes)
-
-app.listen(3333, () => {
-  console.log('Server running')
-})
+app.listen(3333, () => console.log('Server running'))
