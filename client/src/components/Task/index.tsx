@@ -18,6 +18,7 @@ export const Tasks: React.FC = () => {
   const { loading, error, data } = useQuery(ALL_TASKS);
   const { tasks, removeTask, findTask, changeStatus } = useContext(TaskListContext);
   const [isEditing, setEditing] = useState(false);
+  const [search, setSearch] = useState('');
 
   if (loading) {
     return <p>Carregando...</p>;
@@ -29,6 +30,8 @@ export const Tasks: React.FC = () => {
 
   return (
     <>
+      <input type="text" placeholder="Pesquisar tarefas" onChange={(e) => setSearch(e.target.value)} />
+      [search]
       {tasks.map((task) => (
         <TaskCard key={task.id}>
           <div aria-hidden="true" onClick={() => setEditing(!isEditing)} onDoubleClick={() => findTask(task.id)}>{task.title}</div>
