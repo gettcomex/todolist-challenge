@@ -20,7 +20,7 @@ describe('Create todos', () => {
     const { name, status } = await Todo.findOne({ where: { id: body.id } })
 
     expect(name).toBe('Learn React Native')
-    expect(status).toBe('pending')
+    expect(status).toBe('in-progress')
   })
 })
 

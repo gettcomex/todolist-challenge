@@ -22,6 +22,7 @@ export const Header = styled.div`
 `
 
 export const Content = styled.div`
+  min-height: 339px;
   background-color: ${colors.lighter};
   padding: 20px 15px 2px;
 
@@ -37,6 +38,18 @@ export const Content = styled.div`
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 8px;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+    }
+  }
+
+  @media screen and (min-width: 380px) {
+    .filters .buttons-container {
+      flex-direction: row;
     }
   }
 
