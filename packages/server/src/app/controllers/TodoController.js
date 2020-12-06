@@ -17,7 +17,7 @@ module.exports = {
   async store(req, res) {
     const { name } = req.body
 
-    const todo = await Todo.create({ name, status: 'pending' })
+    const todo = await Todo.create({ name, status: 'in-progress' })
 
     return res.json(todo)
   },

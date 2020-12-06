@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { FaPlusCircle } from 'react-icons/fa'
+import useSkipFirstRender from '../../utils/useSkipFirstRender'
+import { API_URL } from '../../constants'
 
 import Filter from '../../components/filter'
 import Todo from '../../components/todo'
 
 import { Container, Header, Content, Label, Input } from './styles'
-
-const todos = [
-  { id: 0, name: 'Levar meu Macbook Pro para o conserto', status: 'complete' },
-  { id: 1, name: 'Fazer compra do mês', status: 'in-progress' },
-  { id: 2, name: 'Trocar lâmpada da garagem', status: 'in-progress' }
-]
 
 const filters = [
   { key: 'all', label: 'Todos' },
@@ -19,11 +15,46 @@ const filters = [
 ]
 
 function Home() {
-  const [_todos, setTodos] = useState(todos)
-  const [filteredTodos, setFilteredTodos] = useState(todos)
+  const [_todos, setTodos] = useState([])
+  const [filteredTodos, setFilteredTodos] = useState([])
   const [filterValue, setFilterValue] = useState('all')
   const [inputValue, setInputValue] = useState('')
   const [inputFocus, setInputFocus] = useState(false)
+
+  function handleInputChange(e) {
+    setInputValue(e.target.value)
+
+    if (e.key === 'Enter') {
+      fetch(`${API_URL}/todos`, {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({ name: e.target.value })
+      })
+        .then(res => res.json())
+        .then(res => {
+          setTodos([res, ..._todos])
+          setInputValue('')
+        })
+    }
+  }
+
+  function handleTodoStatus(id, status) {
+    fetch(`${API_URL}/todos/${id}`, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+      body: JSON.stringify({ status })
+    }).then(() => {
+      setTodos(
+        _todos.map(item => (item.id === id ? { ...item, status } : item))
+      )
+    })
+  }
+
+  function deleteTodo(id) {
+    fetch(`${API_URL}/todos/${id}`, { method: 'DELETE' }).then(() => {
+      setTodos(_todos.filter(item => item.id !== id))
+    })
+  }
 
   function handleFilteredTodos(key) {
     setFilteredTodos(
@@ -36,30 +67,17 @@ function Home() {
     handleFilteredTodos(key)
   }
 
-  function handleInputChange(e) {
-    setInputValue(e.target.value)
-
-    if (e.key === 'Enter') {
-      setTodos([
-        { id: _todos.length, name: e.target.value, status: 'in-progress' },
-        ..._todos
-      ])
-
-      setInputValue('')
-    }
-  }
-
-  function handleTodoStatus(id, status) {
-    setTodos(
-      _todos.map(item => (item.id === id ? { ...item, status } : { ...item }))
-    )
-  }
-
-  function deleteTodo(id) {
-    setTodos(_todos.filter(item => item.id !== id))
+  function getTodos() {
+    fetch(`${API_URL}/todos`, { method: 'GET' })
+      .then(res => res.json())
+      .then(setTodos)
   }
 
   useEffect(() => {
+    getTodos()
+  }, [])
+
+  useSkipFirstRender(() => {
     onPressFilter(filterValue)
   }, [_todos])
 
@@ -83,14 +101,16 @@ function Home() {
       <Content>
         <div className="filters">
           <span>Status</span>
-          {filters.map(filter => (
-            <Filter
-              key={filter.key.toString()}
-              item={filter}
-              filterValue={filterValue}
-              onPressFilter={onPressFilter}
-            />
-          ))}
+          <div className="buttons-container">
+            {filters.map(filter => (
+              <Filter
+                key={filter.key.toString()}
+                item={filter}
+                filterValue={filterValue}
+                onPressFilter={onPressFilter}
+              />
+            ))}
+          </div>
         </div>
         <div className="todos">
           {filteredTodos.map(todo => (

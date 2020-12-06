@@ -8,6 +8,7 @@ export const Filter = styled.div`
   border-radius: 6px;
   padding: 6px 10px 6px 8px;
   margin-right: 10px;
+  margin-bottom: 5px;
   cursor: pointer;
   color: ${props => (props.selected ? colors.white : colors.primary)};
   font-family: 'Inter', sans-serif;
@@ -21,5 +22,9 @@ export const Filter = styled.div`
     font-weight: 600;
     -webkit-text-stroke: ${props =>
       props.selected ? `0.25px ${colors.white}` : 'none'};
+  }
+
+  @media screen and (min-width: 380px) {
+    margin-bottom: 0;
   }
 `
